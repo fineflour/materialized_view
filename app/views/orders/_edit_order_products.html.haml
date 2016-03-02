@@ -1,0 +1,4 @@
+.form-group
+  - order.products.each do |p|
+    = select_tag "order[product_ids][]", options_from_collection_for_select(Product.all, :id, :name, p.id), include_blank: true, class: "col-xs-12 col-sm-4-col-md-4 form-control"
+    %br/

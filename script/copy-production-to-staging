@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# create a backup on production; the URL for it is accessible via pgbackups:url
+#heroku pgbackups:capture --expire --app bfa-ops
+
+# push that backup URL to staging via pgbackups:restore command
+#heroku pgbackups:restore white `heroku pgbackups:url --app bfa-ops` --app staging-oms-on-rails --confirm staging-oms-on-rails
+
+
+heroku pg:copy bfa-ops::ROSE WHITE --app staging-oms-on-rails

@@ -1,0 +1,23 @@
+.row
+  .col-md-11
+    .page-header
+      .pull-right
+        = will_paginate @orders, renderer: BootstrapPagination::Rails      
+      %h1= link_to "Orders", orders_index_path
+    .panel.panel-default
+      .panel-heading
+        = form_tag orders_index_path, { method: :get, class: "input-xxlarge form-query" } do
+          %button.btn.btn-default{"data-target" => "#search-modal", "data-toggle" => "modal", :type => "button"}
+            %span.glyphicon.glyphicon-info-sign{"aria-hidden" => "true"}
+          = text_field_tag :query, params[:query], class: "search-input", placeholder:"Fname Lname id:id has:exception before:YYYY-MM-DD after:YYYY-MM-DD"
+          = submit_tag "Search", class: "btn btn-default query"
+          .dropdown.pull-right
+            %button#dropdownMenu1.btn.btn-default.dropdown-toggle{"aria-expanded" => "true", "data-toggle" => "dropdown", :type => "button"}
+              More options
+              %span.caret
+            %ul.dropdown-menu{"aria-labelledby" => "dropdownMenu1", :role => "menu"}
+      / Table
+      = render partial: "order_table"
+      %span.pull-right
+        = will_paginate @orders, renderer: BootstrapPagination::Rails 
+      = render 'search_modal'

@@ -1,0 +1,71 @@
+%p
+  You can search for any terms that might be found in a name, address, phone number, or email.  Additionally you can search for product names or shortnames, and date of order.
+
+%p
+%h4 Search by Date
+
+%p 
+  You can use the
+  %b before 
+  and
+  %b after
+  options to specify orders made before or after a certain date.
+%p
+  Want all the orders made before Jan 1, 2014?
+%pre
+  before:2014-01-01
+%p
+  Actually you can use other date formats:
+%pre
+  after:01-01-2014
+  before:"Jan 1 2014"
+  after:"2014 Jan 1"
+%p
+  Note that you have to put quotes around any date format that has spaces
+%p
+  What about orders made during October of 2014?  You can use before and after this way:
+%pre
+  after:09-30-2014 before:11-1-2014
+
+%h4 Search by personal info (name, address, email, phone number)
+%p You can also search by personal information just by typing it in plainly:
+
+%pre
+  john smith
+%p Surely there are a few in there.  If you want to narrow it down further you can specify zip codes, etc.
+%pre
+  john smith TX
+  smith 92804
+  smith dallas
+%p Showing all the John Smiths in Texas, all the Smiths in 92804, and Dallas, respectively.  You can do the same thing with phone numbers or street names; anything that is part of an address.
+%pre peachtree
+%p Pulls up a lot of people who presumeably live on a road called "peachtree"
+
+%h4 By order id (order number)
+%p If you happen to know the order number you can find it simply by specifying id:number
+%pre id:105658
+
+%h4 By product name
+%p Sometimes you want to refine your search by searching for a certain product.
+%pre Eric rcv
+%p will show all the eric's who received a recovery version.  You can also use the longer terms for the product:
+%pre Eric recovery version
+%p but you may be happier with the shorter abbreviations for products (which will be appended at the end of this page for your reference)
+%p For now, PLEASE DO NOT DO ANYTHING LIKE THIS:
+%pre Rcv
+%pre Basic Elements
+%p Because our search is currently brought to its knees when there are more than 100,000 results.  This is a temporary problem, but if you can avoid searching for a product name alone for the next few days that would be helpful.  Product name searches should be appended to other search terms.
+
+%h4 Orders with exceptions
+%pre has:exception
+%p and remember that you can add this to any / all of the search examples above.
+
+%h4 Product names and shortnames for use in searches
+
+%table.table-bordered.table-condensed
+  - Product.where(active: true).each do |p|
+    %tr
+      %td= p.name
+      %td= p.shortname
+
+

@@ -1,0 +1,13 @@
+%br/
+.row
+  .col-xs-12.col-sm-12.col-md-10
+    .panel.panel-warning
+      .panel-heading
+        %h3
+          Edit Order ##{@order.id}
+      .panel-body
+        = render partial: "form", locals: { order: @order, button_name: "Save"  }
+      / panel-body
+    / panel-default
+  / col-sm-12 col-md-12
+/ wrapper "show" row

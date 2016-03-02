@@ -1,0 +1,12 @@
+#!/bin/bash
+
+#dropdb ops_development
+#heroku pg:pull rose ops_development -a bfa-ops
+
+# trying something faster perhaps
+
+#curl -o db.dump `heroku pgbackups:url --remote heroku -a bfa-ops`
+curl -o db.dump `heroku pg:backups public-url --remote heroku -a bfa-ops`
+rake db:drop
+rake db:create
+pg_restore --verbose --clean --no-acl --no-owner -d ops_development db.dump

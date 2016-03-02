@@ -1,0 +1,89 @@
+/  Required local params
+/  @param [order] - an instance of Order to render the form for
+= simple_form_for order,html: { class: "form-horizontal order-form" }, |
+  wrapper: :horizontal_form,                                           |
+  wrapper_mappings: {                                                  |
+  } do |f|                                                             |
+  = f.error_notification
+  .row
+    .col-xs-12.col-sm-6.col-md-6
+      = f.input :firstname, label: "First Name"
+      = f.input :lastname, label: "Last Name"
+      = f.input :request_method, collection: Order::REQUEST_METHOD, prompt: "Select a method"
+    .col-xs-12.col-sm-6.col-md-6
+      %fieldset
+        %legend Contact Info
+        = f.input :email
+        = f.input :phone
+  %br/
+  .row
+    .col-xs-12.col-sm-6.col-md-6
+      %fieldset
+        %legend Address
+        / -------------------- (left panel:  address) --------------------
+        = f.input :address1
+        = f.input :address2
+        = f.input :city
+        = f.input :state, collection: Address::STATE_LIST, prompt: "Select a state"
+        = f.input :zip
+    .col-xs-12.col-sm-6.col-md-6
+      %fieldset
+        %legend Questions
+        = f.input :how_heard, collection: Order::HOW_HEARD_OPTIONS, promt: "Select an option"
+        = f.input :language_spoken, collection: Order::LANGUAGE_NAMES, promt: "Select a language"
+        = f.input :requests_further_contact, label: "Requested contact?", as: :boolean, checked_value: true, unchecked_value: false
+  %br
+  .row#orderproductsselection
+    - Order::LANGUAGE_NAMES.each do |lang|
+      - if Product.active_language?(lang)
+        .col-xs-12.col-sm-8.col-md-6.orderproducts
+          %fieldset
+            %legend
+              = lang
+              Products
+            = f.association :products,as: :check_boxes, collection: Product.active.by_language(lang), label: false
+  .row
+    .col-xs-12.col-sm-6.col-md-6
+      %fieldset
+        %legend Notes
+        .notes
+        %div
+          - if params[:action] == "edit"
+            = f.simple_fields_for :notes do |builder|
+              .container-fluid
+                = builder.input :content
+                = builder.input :entered_by, as: :hidden, input_html: { value: current_user.email }
+              .pull-right
+                = builder.label :_destroy, "Remove Notes"
+                = builder.check_box :_destroy, class: {label: "Remove Notes"}
+          - else
+            = f.simple_fields_for :notes do |builder|
+              .container-fluid
+                = builder.input :content, input_html: { value: "OPS Creation(Auto generated)" }
+                = builder.input :entered_by, as: :hidden, input_html: { value: current_user.email }
+  %br/
+  .col-xs-12.col-sm-6.col-md-6
+    - if params[:action] == "new"
+      .panel.panel-warning
+        .panel-heading
+          = f.input_field :skip_limit_check, inline_label: "Don't enforce product limits on this order", as: :boolean
+    .panel.panel-warning
+      .panel-heading
+        - if params[:action] == "edit"
+          = f.input :delivery_type, collection: Order::DELIVERY_TYPES, promt: "Select a Delivery Type"
+        - else
+          = f.input :delivery_type, collection: Order::DELIVERY_TYPES, selected: "bulk", promt: "Select a Delivery Type"
+  .row
+    .col-xs-12.col-sm-12.col-md-12
+      .button-padding.pull-right
+        - if params[:action] == 'edit'
+          / destroy is somehow not destroying associated records
+          / link_to Delete, order, method: :delete, class: btn btn-danger, data: { confirm: Are you sure?}
+          - if @order.is_media?
+            = link_to "Back", media_orders_path, class: "btn btn-default"
+          - else
+            = link_to "Back", orders_path, class: "btn btn-default"
+          = f.submit "Save", class: "btn btn-info", data: { confirm: "Are you sure?" }
+        - else
+          = link_to "Cancel Order", orders_path, class: "btn btn-default", data: { confirm: "Are you sure?" }
+        = f.submit "Submit", class: "btn btn-info", data: { confirm: "Are you sure?" }

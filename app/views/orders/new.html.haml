@@ -1,0 +1,9 @@
+%br/
+.row
+  .col-xs-12.col-sm-12.col-md-10
+    .panel.panel-info
+      .panel-heading
+        %h3 New Order
+      .panel-body
+        / NEW ORDER FORM
+        = render partial: "form", locals: { order: @order}

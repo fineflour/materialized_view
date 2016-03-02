@@ -1,0 +1,197 @@
+%br/
+.row
+  .container-fluid
+    .col-xs-12.col-sm-12.col-md-10
+      #notices
+      .panel.panel-default
+        .panel-heading
+          %h3
+            Order ##{@order.id}
+        .panel-body
+          .row
+            .col-xs-12.col-sm-12.col-md-12
+              %h4
+                = @order.firstname
+                = @order.lastname
+          %br/
+          .row
+            .col-xs-6.col-sm-6.col-md-6
+              %address
+                .row
+                  .col-xs-6.col-sm-6.col-md-6
+                    %label Address:
+                    #order-show-address
+                      = @order.address1
+                      = @order.address2
+                      %br/
+                      = @order.city
+                      , 
+                      \#{@order.state} 
+                      \#{@order.zip}
+                      %br/
+                      .panel-heading
+                        .btn-group.btn-group-sm{"aria-label" => "Default button group", :role => "group"}
+                          - if @order.blocked_by_blacklist?
+                            %u
+                              %strong Blocked because address is on the blacklist
+                          - elsif @order.address_on_blacklist?
+                            %u
+                              %strong Address is already on blacklist
+                          - elsif @order.delivery_point_barcode_exist?
+                            %button.btn.btn-default{"data-target" => "#order-#{@order.id}-modal", "data-toggle" => "modal", :type => "button"} Blacklist this address
+                    .panel.panel-warning.delivery-type
+                      .panel-heading
+                        Delivery Type: #{@order.delivery_type}
+                    .modal.fade{"aria-hidden" => "true", "aria-labelledby" => "myModalLabel", :id => "order-#{@order.id}-modal", :role => "dialog", :tabindex => "-1"}
+                      .modal-dialog
+                        .modal-content
+                          .modal-header
+                            %button.close{"data-dismiss" => "modal", :id => "close-#{@order.id}", :type => "button"}
+                              %span{"aria-hidden" => "true"} ×
+                              %span.sr-only Close
+                            %h4#myModalLabel.modal-title Enter Notes
+                          .modal-body
+                            = simple_form_for [@order, @note], url: order_blacklist_addresses_path(@order), method: :post, html: { class: "form-horizontal" }, remote: true, wrapper: :horizontal_form, wrapper_mappings: {} do |f|
+                              .row
+                                .col-xs-12.col-sm-12.col-md-10
+                                  = f.input :content, label: "Content", require: true
+                                  = f.input :entered_by, as: :hidden, :input_html => { value: current_user.email }
+                              .modal-footer
+                                = f.submit "Blacklist", class: "btn btn-danger", data: {confirm: "Are you sure you want to blacklist this address?"}
+            .col-xs-6.col-sm-6.col-md-6
+              %label Email: 
+              = @order.email.blank? ? "N/A" : @order.email
+              %br/
+              %label Phone:  
+              = @order.phone.blank? ? "N/A" : @order.phone
+              %br/
+              %label Request method:  
+              = @order.request_method.blank? ? "N/A" : @order.request_method
+              %br/
+              %label Date ordered:  
+              = formatted_date(@order.created_at)
+              ,
+              \#{formatted_time(@order.created_at)}
+            %br/
+            %br/
+            .row
+              .col-md-4
+                - if @order.address_exception
+                  - state = @order.address_exception_state
+                  - label_class = ""
+                  - case state
+                  - when "corrected"
+                    - label_class = "text-success"
+                    - ae_label = "<h4 class='text-success'>#{@order.address_exception.type}</h4>"
+                  - when "invalid"
+                    - label_class = "text-danger"
+                    - ae_label = link_to "<h4 class='text-danger'>#{@order.address_exception.type}</h4>".html_safe, address_exceptions_path(:query => @order.address1)
+                  - when "undeliverable"
+                    - label_class = "text-warning"
+                    - ae_label = "<h4 class='text-warning'>#{@order.address_exception.type}</h4>"
+                  - else
+                    - label_class = "text-primary"
+                    - ae_label = "<h4 class='text-primary'>#{@order.address_exception.type}</h4>"
+                  .row
+                    .col-md-4
+                      = ae_label.html_safe
+                  .row
+                    .col-md-4
+                      %p{:class => label_class}= state
+            %br/
+            / Order Products table
+          .row
+            .col-sm-12.col-md-12
+              .panel.panel-default
+                .panel-heading Products
+                .panel-body
+                  / loop through the products collection
+                  .table-responsive
+                    %table.table.table-simple.table-hover
+                      %thead
+                        %tr
+                          %td
+                            %strong Product
+                          %td
+                            %strong Language
+                          %td
+                            %strong Fulfillment Status
+                          %td
+                      %tbody
+                        - @order.orderproducts.each do |op|
+                          %tr{:id => "orderproduct-#{op.id}"}
+                            %td
+                              = op.name
+                              (##{op.id})
+                            %td= op.language
+                            %td
+                              = orderproduct_fulfillment_status(op)
+                              - unless op.pallet.nil?
+                                (pallet: #{link_to "##{op.pallet.id}", pallet_path(op.pallet)})
+                            %td
+                              = link_to "Remove", {controller: 'orders/orderproducts', action: 'destroy',                                                                                                                                           |
+                                order_id: @order.id, id: op.id}, method: :delete, class: "btn btn-danger", data: {confirm: "Are you sure you want to delete #{op.name} from this order?  This cannot be undone." } if op.can_be_deleted_from_order? |
+          .row
+            .col-sm-6.col-md-6
+              .panel.panel-default
+                .panel-heading About
+                .panel-body
+                  .table-responsive
+                    %tbody
+                      %ul.list-group
+                        %li.list-group-item
+                          %b How Heard:  
+                          = @order.how_heard.blank? ? "N/A" : @order.how_heard
+                        - if @order.requests_further_contact
+                          %li.list-group-item.list-group-item-success
+                            %b> Requested Further Contact:  
+                            Yes
+                        - else
+                          %li.list-group-item.list-group-item
+                            %b> Requested Further Contact:  
+                            No
+                        %li.list-group-item
+                          %b Language Spoken:  
+                          = @order.language_spoken.blank? ? "N/A" : @order.language_spoken
+            .col-sm-6.col-md-6
+              .panel.panel-default
+                .panel-heading Notes
+                .panel-body
+                  .table-responsive
+                    %tbody
+                      %ul.list-group
+                        - for note in @order.notes
+                          %li.list-group-item
+                            - if note.content.present?
+                              %i= note.content
+                              \-
+                              %b
+                                = formatted_date(note.created_at)
+                                ,
+                                \#{formatted_time(note.created_at)}, Entered by:
+                                %ins= note.who_entered
+                              %br/
+                              %br/
+                              = link_to "Edit", edit_order_note_path(@order, note), class: "btn btn-info btn-sm"
+                              = link_to "Delete", order_note_path(@order, note), class: "btn btn-danger btn-sm", method: :delete, data: { confirm: "Are you sure?" }
+          .row
+            .col-sm-12.col-md-12
+              %span.pull-right
+                = link_to "New Order for this Person", reenter_without_products_order_path(@order), class: "btn"
+                = link_to "Re-enter this Order for this Person", reenter_with_products_order_path(@order), class: "btn"
+                - if @order.non_editable_state?
+                  - if @order.is_media?
+                    = link_to "Back", media_orders_path, class: "btn btn-default"
+                  - else
+                    = link_to "Back", orders_path, class: "btn btn-default"
+                  = link_to "Add Notes", new_order_note_path(@order), class: "btn btn-info"
+                - else
+                  = link_to "Back", orders_path, class: "btn btn-default"
+                  - unless @order.cancelled?
+                    = link_to "Edit Order", edit_order_path(@order), class: "btn btn-info"
+                - if @order.has_invalid_address_exception? && !@order.is_open_media?
+                  = link_to 'Check Address', address_exceptions_path(:query => @order.address1), :class => "btn btn-danger"
+                - elsif @order.has_undeliverable_address_exception?
+                  = link_to 'Rescue Address', rescue_address_exception_path(@order), :class => "btn btn-success", :method => :post, data: {confirm: "Are you sure." }
+                - elsif @order.has_exception?
+                  = link_to 'Approve!', approve_order_path(@order), :class => "btn btn-success", :method => :post, data: {confirm: "Are you sure."}

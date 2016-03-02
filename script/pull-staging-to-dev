@@ -1,0 +1,5 @@
+#!/bin/bash
+
+
+curl -o db.dump `heroku pg:backups public-url --remote heroku -a staging-oms-on-rails`
+pg_restore --verbose --clean --no-acl --no-owner -d ops_development db.dump
