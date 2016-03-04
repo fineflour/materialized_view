@@ -23,26 +23,5 @@
           %td= order.email
           / td><haml_loud> link_to order.products.size, order_path(order) </haml_loud></td
           %td.col-md-2
-            (#{link_to order.products.size, orders_show_path(order)}) 
-            - order.products.each do |p|
-              = display_shortname(p.shortname)
-          %td
-            - unless order.notes.empty?
-              - if order.notes.first.entered_by.present?
-                = order.notes.first.entered_by[/[^@]+/]
-              - else
-                N/A
-            - else
-              N/A
-          %td= order.request_method.blank? ? "N/A" : order.request_method
-          / status
-          %td.col-md-2
-            = link_to "Show", orders_show_path(order)
-            |
-            - if order.cancelled?
-              cancelled
-            - elsif order.palletized_and_after_state?
-              Cancel
-            - else
-              = link_to "Cancel",     |
-                method: :put, data: { confirm: "Are you sure?"} |
+            = order.pname
+         

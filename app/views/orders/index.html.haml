@@ -2,11 +2,10 @@
   .col-md-11
     .page-header
       .pull-right
-        = will_paginate @orders, renderer: BootstrapPagination::Rails      
-      %h1= link_to "Orders", orders_index_path
+      %h1= link_to "Orders", orders_path
     .panel.panel-default
       .panel-heading
-        = form_tag orders_index_path, { method: :get, class: "input-xxlarge form-query" } do
+        = form_tag orders_path, { method: :get, class: "input-xxlarge form-query" } do
           %button.btn.btn-default{"data-target" => "#search-modal", "data-toggle" => "modal", :type => "button"}
             %span.glyphicon.glyphicon-info-sign{"aria-hidden" => "true"}
           = text_field_tag :query, params[:query], class: "search-input", placeholder:"Fname Lname id:id has:exception before:YYYY-MM-DD after:YYYY-MM-DD"
@@ -19,5 +18,5 @@
       / Table
       = render partial: "order_table"
       %span.pull-right
-        = will_paginate @orders, renderer: BootstrapPagination::Rails 
+      %h1= link_to "Orders", orders_path
       = render 'search_modal'

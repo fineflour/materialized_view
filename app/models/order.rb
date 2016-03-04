@@ -196,7 +196,7 @@ class Order < ActiveRecord::Base
       OrderSearch.new(query).result
     else
       #Order.all
-      Order.limit(100)
+      Order.all
     end
   end
 

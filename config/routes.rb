@@ -1,11 +1,10 @@
 Rails.application.routes.draw do
 
-  get 'orders/index'
-
-  get 'orders/show'
 
   devise_for :users, :skip => [:registrations] 
   resources :users, only: [:index, :show]
+  resources :search_orders, only: [:index] 
+  resources :orders, only: [:index, :show] 
   root to: 'orders#index'
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

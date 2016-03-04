@@ -1,0 +1,7 @@
+.field
+  = f.attribute_fields do |a|
+    = a.attribute_select associations: [:products]
+  = f.select :p, { 'contains' => :cont, 'greater than' => :gteq, 'less than' => :lteq }
+  = f.value_fields do |v|
+    = v.text_field :value
+  = link_to "remove", '#', class: "remove_fields"

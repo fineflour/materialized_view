@@ -1,0 +1,16 @@
+﻿    SELECT o.created_at AS date_ordered,
+    o.id AS orderid,
+    o.firstname AS firstname,
+    o.lastname AS lastname,
+    o.email AS email,
+    o.address1 AS address1,
+    o.address2 AS address2,
+    o.city AS city,
+    o.state AS state,
+    o.search_body AS search_body,
+    array_to_string(array_agg(op.product_id),',') AS pid,
+    array_to_string(array_agg(p.name), ',') AS pname
+    FROM orders o
+    INNER JOIN orderproducts op ON op.order_id = o.id
+    INNER JOIN products p ON op.product_id = p.id
+    GROUP BY o.id limit(1000);
